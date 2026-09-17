@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>NemuKos — Solusi Ngekos Tanpa Ribet</title>
+
+    <meta
+        name="description"
+        content="NemuKos membantu kamu menemukan kos di sekitar ITS, Sukolilo, Keputih, Gebang, dan area kampus terdekat."
+    >
+
+    <!-- CSS utama -->
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <!-- Leaflet Map -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin=""
+    >
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+    <header class="nav">
+
+        <a class="brand" href="./index.html">
+            <span class="brand-icon">⌂</span>
+            NemuKos
+        </a>
+
+        <nav>
+
+            <a href="#listing">
+                Cari Kos
+            </a>
+
+            <a href="#mapSection">
+                Peta
+            </a>
+
+            <button
+                class="btn dark"
+                type="button"
+                onclick="openModal('post')"
+            >
+                + Pasang Kos
+            </button>
+
+            <span
+                class="user"
+                id="userArea"
+            >
+                Guest ·
+                <button
+                    class="btn ghost"
+                    type="button"
+                    onclick="openLogin()"
+                    style="padding:4px"
+                >
+                    Login
+                </button>
+            </span>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================
+         HERO
+    ========================== -->
+    <section class="hero">
+
+        <div class="hero-inner">
+
+            <span class="eyebrow">
+                NemuKos • Solusi Ngekos Tanpa Ribet
+            </span>
+
+            <h1>
+                Temukan kos idaman,
+                <br>
+                <em>Gak perlu muter-muter.</em>
+            </h1>
+
+            <p>
+                Cari tempat tinggal di sekitar ITS,
+                Sukolilo, Keputih, Gebang,
+                dan area kampus terdekat.
+            </p>
+
+            <div class="searchbox">
+
+                <input
+                    id="search"
+                    type="search"
+                    placeholder="Cari nama kos, lokasi, atau fasilitas..."
+                    autocomplete="off"
+                >
+
+                <button
+                    class="btn dark"
+                    type="button"
+                    onclick="render()"
+                >
+                    Cari Kos
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         FILTER
+    ========================== -->
+    <section
+        class="toolbar"
+        id="listing"
+    >
+
+        <div class="filter">
+
+            <label for="maxPrice">
+                HARGA MAKSIMAL
+            </label>
+
+            <select
+                id="maxPrice"
+                onchange="render()"
+            >
+                <option value="">
+                    Semua harga
+                </option>
+
+                <option value="1000000">
+                    Rp1 jt
+                </option>
+
+                <option value="1500000">
+                    Rp1,5 jt
+                </option>
+
+                <option value="2000000">
+                    Rp2 jt
+                </option>
+            </select>
+
+        </div>
+
+
+        <div class="filter">
+
+            <label for="gender">
+                PENGHUNI
+            </label>
+
+            <select
+                id="gender"
+                onchange="render()"
+            >
+                <option value="">
+                    Semua
+                </option>
+
+                <option value="PUTRA">
+                    PUTRA
+                </option>
+
+                <option value="PUTRI">
+                    PUTRI
+                </option>
+
+                <option value="CAMPUR">
+                    CAMPUR
+                </option>
+            </select>
+
+        </div>
+
+
+        <div class="filter">
+
+            <label for="amenity">
+                FASILITAS
+            </label>
+
+            <select
+                id="amenity"
+                onchange="render()"
+            >
+                <option value="">
+                    Semua fasilitas
+                </option>
+
+                <option value="WiFi">
+                    WiFi
+                </option>
+
+                <option value="Security">
+                    Security
+                </option>
+
+                <option value="Parking">
+                    Parking
+                </option>
+
+                <option value="Aircon">
+                    Aircon
+                </option>
+
+                <option value="Laundry">
+                    Laundry
+                </option>
+
+                <option value="Kitchen">
+                    Kitchen
+                </option>
+            </select>
+
+        </div>
+
+
+        <button
+            class="btn outline"
+            type="button"
+            onclick="locate()"
+        >
+            ⌖ Kos terdekat saya
+        </button>
+
+
+        <button
+            class="btn ghost"
+            type="button"
+            onclick="resetFilters()"
+        >
+            Reset
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         LIST KOS
+    ========================== -->
+    <section class="content">
+
+        <div class="section-head">
+
+            <div>
+
+                <h2>
+                    Kos pilihan di ITS Raya
+                </h2>
+
+                <p id="resultText">
+                    Memuat data kos...
+                </p>
+
+            </div>
+
+
+            <select
+                id="sort"
+                onchange="render()"
+                style="
+                    padding:10px;
+                    border:1px solid #ddd;
+                    border-radius:9px;
+                "
+            >
+
+                <option value="new">
+                    Terbaru
+                </option>
+
+                <option value="low">
+                    Harga terendah
+                </option>
+
+                <option value="high">
+                    Harga tertinggi
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div
+            class="cards"
+            id="cards"
+        >
+            <!-- Data kos diisi oleh JavaScript -->
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         MAP
+    ========================== -->
+    <section
+        class="map-section"
+        id="mapSection"
+    >
+
+        <div class="section-head">
+
+            <div>
+
+                <h2>
+                    Lihat kos di sekitar kamu
+                </h2>
+
+                <p>
+                    Izinkan lokasi browser untuk
+                    menampilkan posisi dan kos terdekat.
+                </p>
+
+            </div>
+
+
+            <button
+                class="btn outline"
+                type="button"
+                onclick="locate()"
+            >
+                Gunakan GPS
+            </button>
+
+        </div>
+
+
+        <div class="map-wrap">
+
+            <div id="map"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         MODAL
+    ========================== -->
+    <div
+        class="modal hidden"
+        id="modal"
+        aria-hidden="true"
+    >
+
+        <div
+            class="modal-card"
+            role="dialog"
+            aria-modal="true"
+        >
+
+            <button
+                class="close"
+                type="button"
+                aria-label="Tutup"
+                onclick="closeModal()"
+            >
+                ×
+            </button>
+
+            <div id="modalBody">
+                <!-- Isi modal dari JS -->
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         TOAST
+    ========================== -->
+    <div
+        class="toast"
+        id="toast"
+        style="display:none"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <!-- Leaflet -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin=""
+    ></script>
+
+    <!-- App JavaScript -->
+    <script src="./js/app.js"></script>
+
+</body>
+</html>
